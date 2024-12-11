@@ -3,16 +3,24 @@ import { useState } from 'react';
 function App() {
   const [tareas, setTareas] = useState([]);
   const [nuevaTarea, setNuevaTarea] = useState("");
+  const [error, setError] = useState(""); 
 
   const agregarTarea = () => {
-    if (nuevaTarea.trim() !== "") {
+
+    if (tareas.some((tarea) => tarea.descripcion.toLowerCase() === nuevaTarea.toLowerCase())) {
+      setError("¡La tarea ya existe!"); 
+    } else if (nuevaTarea.trim() !== "") {
+
       const nuevaTareaObj = {
         id: Date.now(),
         descripcion: nuevaTarea,
         completada: false,
       };
       setTareas([...tareas, nuevaTareaObj]);
-      setNuevaTarea(""); // Limpiar el campo de texto
+      setNuevaTarea(""); 
+      setError(""); 
+    } else {
+      setError("Por favor, ingresa una tarea válida."); 
     }
   };
 
@@ -28,6 +36,13 @@ function App() {
     setTareas(tareas.filter((tarea) => tarea.id !== id));
   };
 
+  // Función para borrar todas las tareas
+  const borrarTodasTareas = () => {
+    if (window.confirm("¿Estás seguro de que deseas eliminar todas las tareas?")) {
+      setTareas([]); // Limpiar todas las tareas
+    }
+  };
+
   return (
     <div className="App">
       <div className="todo-container">
@@ -41,6 +56,12 @@ function App() {
           />
           <button onClick={agregarTarea}>Agregar</button>
         </div>
+
+        {error && <p style={{ color: 'red' }}>{error}</p>}
+
+        <button onClick={borrarTodasTareas} style={{ marginTop: '10px' }}>
+          Borrar todas las tareas
+        </button>
 
         <ul>
           {tareas.map((tarea) => (
